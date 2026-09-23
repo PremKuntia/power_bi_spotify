@@ -1,1 +1,32 @@
+-- some important syntax -- 
+-- Create a Date Table to get the real time and unique dates for each start to end date (Very Important)
+
+Date Table = Calender(min(main column), max(main column))
+
+-- get the min and max values for a line chart
+
+MinMax Albumns Line Chart = 
+VAR _maxValue = MAXX(ALLSELECTED('Date Table'[Year]) , CALCULATE(DISTINCTCOUNT ('public spotify_bi'[album_name])))
+
+VAR _minValue = MINX(ALLSELECTED('Date Table'[Year]), CALCULATE(DISTINCTCOUNT ('public spotify_bi'[album_name])))
+
+VAR _currentValue =  CALCULATE(DISTINCTCOUNT ('public spotify_bi'[album_name]))
+RETURN 
+IF(_currentValue = _maxValue || _currentValue = _minValue, _currentValue, BLANK())
+
+-- current Year record 
+CurrentYearAlbums = 
+VAR _LatestYear = MAX('Date Table'[Year])
+RETURN 
+CALCULATE(DISTINCTCOUNT(spotify_history[album_name]), 'Date Table'[Year] = _LatestYear)
+
+-- Previous Year record
+PreviousYearAlbums = 
+VAR _LatestYear = MAX('Date Table'[Year])
+VAR _PreviousYear = _LatestYear - 1
+RETURN 
+CALCULATE(DISTINCTCOUNT(spotify_history[album_name]), 'Date Table'[Year] = _PreviousYear)
+
+-- previous year and yoy album KPIs 
+
 
