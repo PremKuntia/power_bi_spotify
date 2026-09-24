@@ -28,5 +28,27 @@ RETURN
 CALCULATE(DISTINCTCOUNT(spotify_history[album_name]), 'Date Table'[Year] = _PreviousYear)
 
 -- previous year and yoy album KPIs 
+PY and YoY Albums KPI = 
 
+VAR _latest = [LatestYearAlbums]
+VAR _previous = [PreviousYearAlbums]
+VAR _YoY = If(not(isblank(_previous)), divide(_latest - _previous, _previous, 0), BlANK())
+RETURN 
+IF(NOT(ISBLANK(_previous)),
+"vs PY: " & FORMAT(_previous, "#,##0") & 
+"(" & FORMAT(_YoY, "0.00%") & ")",
+"No Data")
 
+-- comparing with latest and previous year
+CurrentYearAlbumNew = 
+VAR _CurrentYear = 
+CALCULATE(MAX('DATE Table'[Year]),
+'Date Table', -- ensures the date table is used properly
+TREATAS(Values(spotify_history[Year pf Track Date]), 'Date Table'[Year]), -- Ensures filtering works properly
+VALUES(spotify[platform]) --Ensures we respect the selected platform
+)
+RETURN
+CALCULATE(DISTINCTCOUNT(spotify_history[album_name]),
+'Date Table'[Year] = _CurrentYear)
+
+--- Weekday_Weekend = IF(WEEKDAY('Date Table'[Date],2)<=5,"Weekday", "Weekend")
